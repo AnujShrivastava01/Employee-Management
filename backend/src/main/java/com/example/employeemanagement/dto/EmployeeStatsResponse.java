@@ -9,5 +9,6 @@ public record EmployeeStatsResponse(
         long inactiveEmployees,
         long totalDepartments,
         List<DepartmentHeadcount> departmentDistribution,
+        List<HiringTrendPoint> hiringTrend,
         List<EmployeeResponse> recentlyJoined) {
 }

@@ -12,6 +12,7 @@ import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 public interface EmployeeRepository extends JpaRepository<Employee, Long>, JpaSpecificationExecutor<Employee> {
 
@@ -46,4 +47,13 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long>, JpaSp
             order by count(e) desc, d.name
             """)
     List<DepartmentHeadcount> countByDepartment();
+
+    @Query("""
+            select new com.example.employeemanagement.repository.MonthlyHires(
+                year(e.dateOfJoining), month(e.dateOfJoining), count(e))
+            from Employee e
+            where e.dateOfJoining between :from and :to
+            group by year(e.dateOfJoining), month(e.dateOfJoining)
+            """)
+    List<MonthlyHires> countHiresByMonth(@Param("from") LocalDate from, @Param("to") LocalDate to);
 }

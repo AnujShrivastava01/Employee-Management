@@ -13,6 +13,7 @@ import com.example.employeemanagement.dto.EmployeeFilter;
 import com.example.employeemanagement.dto.EmployeeRequest;
 import com.example.employeemanagement.dto.EmployeeResponse;
 import com.example.employeemanagement.dto.EmployeeStatsResponse;
+import com.example.employeemanagement.dto.HiringTrendPoint;
 import com.example.employeemanagement.dto.PageResponse;
 import com.example.employeemanagement.entity.Department;
 import com.example.employeemanagement.entity.Employee;
@@ -25,6 +26,7 @@ import com.example.employeemanagement.mapper.EmployeeMapper;
 import com.example.employeemanagement.repository.DepartmentHeadcount;
 import com.example.employeemanagement.repository.DepartmentRepository;
 import com.example.employeemanagement.repository.EmployeeRepository;
+import com.example.employeemanagement.repository.MonthlyHires;
 import com.example.employeemanagement.support.TestData;
 import java.time.Clock;
 import java.time.Instant;
@@ -312,6 +314,20 @@ class EmployeeServiceImplTest {
             assertThat(stats.departmentDistribution()).extracting(DepartmentHeadcount::department)
                     .containsExactly("Engineering", "Design");
             assertThat(stats.recentlyJoined()).hasSize(1);
+        }
+
+        @Test
+        void hiringTrendCoversTwelveMonthsAndFillsGapsWithZero() {
+            when(employeeRepository.countHiresByMonth(LocalDate.of(2025, 11, 1), LocalDate.of(2026, 10, 31)))
+                    .thenReturn(List.of(new MonthlyHires(2026, 10, 3), new MonthlyHires(2026, 2, 1)));
+
+            List<HiringTrendPoint> trend = service.getStats().hiringTrend();
+
+            assertThat(trend).hasSize(12);
+            assertThat(trend.get(0)).isEqualTo(new HiringTrendPoint("2025-11", 0));
+            assertThat(trend.get(3)).isEqualTo(new HiringTrendPoint("2026-02", 1));
+            assertThat(trend.get(11)).isEqualTo(new HiringTrendPoint("2026-10", 3));
+            assertThat(trend).extracting(HiringTrendPoint::count).containsExactly(0L, 0L, 0L, 1L, 0L, 0L, 0L, 0L, 0L, 0L, 0L, 3L);
         }
 
         @Test

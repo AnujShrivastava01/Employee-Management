@@ -329,6 +329,26 @@ class EmployeeApiTest extends AbstractApiTest {
     }
 
     @Test
+    void statsIncludeTwelveMonthHiringTrend() throws Exception {
+        java.time.YearMonth now = java.time.YearMonth.now();
+        saveEmployee("EMP-1", "A", "a@example.com", engineering, EmploymentStatus.ACTIVE, "1", now.atDay(1));
+        saveEmployee("EMP-2", "B", "b@example.com", engineering, EmploymentStatus.ACTIVE, "1", now.atDay(1));
+        saveEmployee("EMP-3", "C", "c@example.com", design, EmploymentStatus.ACTIVE, "1", now.minusMonths(3).atDay(15));
+        saveEmployee("EMP-4", "D", "d@example.com", design, EmploymentStatus.ACTIVE, "1", now.minusMonths(11).atDay(1)); // oldest month shown
+        saveEmployee("EMP-5", "E", "e@example.com", design, EmploymentStatus.ACTIVE, "1", now.minusMonths(12).atDay(1)); // outside the window
+
+        mockMvc.perform(asAdmin(get("/api/employees/stats")))
+                .andExpect(jsonPath("$.hiringTrend", hasSize(12)))
+                .andExpect(jsonPath("$.hiringTrend[0].month").value(now.minusMonths(11).toString()))
+                .andExpect(jsonPath("$.hiringTrend[0].count").value(1))
+                .andExpect(jsonPath("$.hiringTrend[8].month").value(now.minusMonths(3).toString()))
+                .andExpect(jsonPath("$.hiringTrend[8].count").value(1))
+                .andExpect(jsonPath("$.hiringTrend[11].month").value(now.toString()))
+                .andExpect(jsonPath("$.hiringTrend[11].count").value(2))
+                .andExpect(jsonPath("$.hiringTrend[5].count").value(0));
+    }
+
+    @Test
     void statsForEmptyDatabaseAreZero() throws Exception {
         mockMvc.perform(asAdmin(get("/api/employees/stats")))
                 .andExpect(jsonPath("$.totalEmployees").value(0))

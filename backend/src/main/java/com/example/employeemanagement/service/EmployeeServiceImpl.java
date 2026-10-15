@@ -5,6 +5,7 @@ import com.example.employeemanagement.dto.EmployeeRequest;
 import com.example.employeemanagement.dto.EmployeeResponse;
 import com.example.employeemanagement.dto.EmployeeStatsResponse;
 import com.example.employeemanagement.dto.FieldErrorDetail;
+import com.example.employeemanagement.dto.HiringTrendPoint;
 import com.example.employeemanagement.dto.PageResponse;
 import com.example.employeemanagement.entity.Department;
 import com.example.employeemanagement.entity.Employee;
@@ -17,10 +18,14 @@ import com.example.employeemanagement.mapper.EmployeeMapper;
 import com.example.employeemanagement.repository.DepartmentRepository;
 import com.example.employeemanagement.repository.EmployeeRepository;
 import com.example.employeemanagement.repository.EmployeeSpecifications;
+import com.example.employeemanagement.repository.MonthlyHires;
 import java.time.Clock;
 import java.time.LocalDate;
+import java.time.YearMonth;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Consumer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,6 +43,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class EmployeeServiceImpl implements EmployeeService {
 
     static final int MAX_PAGE_SIZE = 100;
+    static final int TREND_MONTHS = 12;
 
     private static final Logger log = LoggerFactory.getLogger(EmployeeServiceImpl.class);
 
@@ -129,7 +135,23 @@ public class EmployeeServiceImpl implements EmployeeService {
                 inactive,
                 departmentRepository.count(),
                 employeeRepository.countByDepartment(),
+                hiringTrend(),
                 recent);
+    }
+
+    /** Hires per month for the last {@value #TREND_MONTHS} months (current one included); empty months are 0. */
+    private List<HiringTrendPoint> hiringTrend() {
+        YearMonth current = YearMonth.now(clock);
+        YearMonth first = current.minusMonths(TREND_MONTHS - 1L);
+        Map<YearMonth, Long> hires = new HashMap<>();
+        for (MonthlyHires row : employeeRepository.countHiresByMonth(first.atDay(1), current.atEndOfMonth())) {
+            hires.put(YearMonth.of(row.year(), row.month()), row.count());
+        }
+        List<HiringTrendPoint> trend = new ArrayList<>(TREND_MONTHS);
+        for (YearMonth month = first; !month.isAfter(current); month = month.plusMonths(1)) {
+            trend.add(new HiringTrendPoint(month.toString(), hires.getOrDefault(month, 0L)));
+        }
+        return trend;
     }
 
     @Override
