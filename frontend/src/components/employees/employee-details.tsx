@@ -87,7 +87,7 @@ export function EmployeeDetails({ id }: { id: string }) {
               </Link>
             </Button>
             <Button asChild>
-              <Link href={`/employees/${employee.id}/edit`}>
+              <Link href={`/employees/${employee.id}/edit`} prefetch={false}>
                 <Pencil /> Edit
               </Link>
             </Button>

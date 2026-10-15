@@ -23,6 +23,8 @@ interface EmployeeTableProps {
 }
 
 // Secondary columns drop out on narrower screens; the primary cell keeps the essentials visible.
+// Row links are dynamic, per-record routes: prefetching them would fire up to 2 RSC requests per visible row
+// (and raced with immediate clicks during testing), so they are fetched on demand instead.
 // Breakpoints are tuned to the available content width (the 16rem sidebar appears from `lg`).
 const RESPONSIVE: Record<string, string> = {
   department: "hidden md:table-cell",
@@ -74,7 +76,7 @@ export function EmployeeTable({ employees, sortBy, sortDir, onSort, onDelete, is
             <div className="flex items-center gap-3">
               <EmployeeAvatar name={e.fullName} />
               <div className="min-w-0 max-w-[10.5rem] sm:max-w-[16rem]">
-                <Link href={`/employees/${e.id}`} className="block truncate font-medium hover:text-accent hover:underline">
+                <Link href={`/employees/${e.id}`} prefetch={false} className="block truncate font-medium hover:text-accent hover:underline">
                   {e.fullName}
                 </Link>
                 <span className="block truncate text-xs text-muted-foreground">{e.email}</span>
@@ -124,12 +126,12 @@ export function EmployeeTable({ employees, sortBy, sortDir, onSort, onDelete, is
           return (
             <div className="flex justify-end gap-0.5">
               <Button asChild variant="ghost" size="icon">
-                <Link href={`/employees/${e.id}`} aria-label={`View ${e.fullName}`} title="View">
+                <Link href={`/employees/${e.id}`} prefetch={false} aria-label={`View ${e.fullName}`} title="View">
                   <Eye />
                 </Link>
               </Button>
               <Button asChild variant="ghost" size="icon">
-                <Link href={`/employees/${e.id}/edit`} aria-label={`Edit ${e.fullName}`} title="Edit">
+                <Link href={`/employees/${e.id}/edit`} prefetch={false} aria-label={`Edit ${e.fullName}`} title="Edit">
                   <Pencil />
                 </Link>
               </Button>

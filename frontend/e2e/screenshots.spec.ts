@@ -47,7 +47,7 @@ test.describe("screenshots", () => {
     await page.goto("/employees");
     await page.getByRole("button", { name: /^Delete / }).first().click();
     await page.getByRole("alertdialog").waitFor();
-    await page.screenshot(shot("08-delete-confirmation"));
+    await page.screenshot({ ...shot("08-delete-confirmation"), fullPage: false }); // the modal overlay is viewport-sized
 
     await page.goto("/departments");
     await page.getByRole("table", { name: "Departments" }).waitFor();

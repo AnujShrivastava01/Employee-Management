@@ -133,7 +133,7 @@ export function Dashboard() {
               <ul className="divide-y divide-border">
                 {data?.recentlyJoined.map((employee) => (
                   <li key={employee.id}>
-                    <Link href={`/employees/${employee.id}`} className="-mx-2 flex items-center gap-3 rounded-md px-2 py-2.5 transition-colors hover:bg-surface-muted">
+                    <Link href={`/employees/${employee.id}`} prefetch={false} className="-mx-2 flex items-center gap-3 rounded-md px-2 py-2.5 transition-colors hover:bg-surface-muted">
                       <EmployeeAvatar name={employee.fullName} />
                       <span className="min-w-0 flex-1">
                         <span className="block truncate text-sm font-medium">{employee.fullName}</span>
