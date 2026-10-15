@@ -9,7 +9,7 @@ export function Select({ className, children, ...props }: React.ComponentProps<"
     <div className={cn("relative", className)}>
       <select
         data-slot="select"
-        className={cn(fieldControlClasses, "h-9 cursor-pointer appearance-none pr-9")}
+        className={cn(fieldControlClasses, "h-10 cursor-pointer appearance-none pr-9")}
         {...props}
       >
         {children}

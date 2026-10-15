@@ -48,7 +48,7 @@ export function EmployeeFilters({ params, departments, onChange, onClear, deboun
   }, [text]);
 
   return (
-    <div className="flex flex-col gap-3 border-b border-border p-4 md:flex-row md:items-center">
+    <div className="flex flex-col gap-3 border-b border-border bg-gradient-to-b from-white to-surface-muted/60 p-4 md:flex-row md:items-center">
       <div className="relative flex-1 md:max-w-xs">
         <Search aria-hidden className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
         <Input

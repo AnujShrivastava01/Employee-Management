@@ -35,7 +35,7 @@ export function Pagination({ page, size, totalElements, totalPages, onPageChange
   const lastPage = Math.max(totalPages - 1, 0);
 
   return (
-    <div className="flex flex-col gap-3 border-t border-border px-4 py-3 text-sm sm:flex-row sm:items-center sm:justify-between">
+    <div className="flex flex-col gap-3 border-t border-border bg-surface-muted/50 px-4 py-3.5 text-sm sm:flex-row sm:items-center sm:justify-between">
       <p className="text-muted-foreground" aria-live="polite">
         Showing <span className="font-medium text-foreground">{from}–{to}</span> of{" "}
         <span className="font-medium text-foreground">{totalElements}</span> {noun}

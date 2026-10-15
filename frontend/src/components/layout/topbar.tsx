@@ -42,14 +42,14 @@ export function Topbar() {
   };
 
   return (
-    <header className="sticky top-0 z-20 flex h-14 items-center gap-3 border-b border-border bg-surface/90 px-4 backdrop-blur sm:px-6">
+    <header className="sticky top-0 z-20 flex h-16 items-center gap-3 border-b border-border/70 bg-white/75 px-4 shadow-[0_1px_0_rgb(255_255_255/0.8)] backdrop-blur-xl sm:px-6">
       <Button variant="ghost" size="icon" className="lg:hidden" aria-label="Open navigation" onClick={() => setMenuOpen(true)}>
         <Menu />
       </Button>
       <Dialog open={menuOpen} onOpenChange={setMenuOpen}>
         <DialogContent
           aria-describedby={undefined}
-          className="left-0 top-0 h-full max-w-72 translate-x-0 translate-y-0 gap-0 rounded-none border-y-0 border-l-0 p-0 data-[state=open]:slide-in-from-left"
+          className="left-0 top-0 h-full max-w-72 translate-x-0 translate-y-0 gap-0 overflow-hidden rounded-none border-0 p-0 data-[state=open]:slide-in-from-left [&>button]:text-white/70 [&>button]:hover:bg-white/10 [&>button]:hover:text-white"
         >
           <DialogTitle className="sr-only">Navigation</DialogTitle>
           <DialogDescription className="sr-only">Main navigation links</DialogDescription>
@@ -57,7 +57,7 @@ export function Topbar() {
         </DialogContent>
       </Dialog>
 
-      <form role="search" onSubmit={submitSearch} className="relative hidden w-full max-w-sm sm:block">
+      <form role="search" onSubmit={submitSearch} className="relative hidden w-full max-w-md sm:block">
         <Search aria-hidden className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
         <Input
           type="search"
@@ -65,19 +65,20 @@ export function Topbar() {
           placeholder="Quick search employees…"
           value={query}
           onChange={(event) => setQuery(event.target.value)}
-          className="bg-surface-muted pl-9 shadow-none"
+          className="rounded-full border-transparent bg-[#eceefa] pl-10 shadow-none hover:border-periwinkle/40 focus-visible:bg-white"
         />
       </form>
 
-      <div className="ml-auto">
+      <div className="ml-auto flex items-center gap-3">
+        <span className="hidden text-sm text-muted-foreground md:block">{new Date().toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long" })}</span>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <button
               type="button"
               aria-label="Account menu"
-              className="flex items-center gap-2 rounded-md py-1 pl-1 pr-2 transition-colors hover:bg-black/5"
+              className="flex items-center gap-2 rounded-full py-1 pl-1 pr-2.5 transition-colors hover:bg-accent-soft"
             >
-              <span className="grid size-7 place-items-center rounded-full bg-accent-soft text-xs font-semibold text-accent">
+              <span className="grid size-8 place-items-center rounded-full bg-brand text-xs font-bold text-white shadow-sm">
                 {initials(user?.username ?? "?")}
               </span>
               <span className="hidden text-sm font-medium sm:inline">{user?.username}</span>

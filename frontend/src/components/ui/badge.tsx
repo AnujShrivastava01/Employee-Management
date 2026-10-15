@@ -5,9 +5,9 @@ import { cn } from "@/lib/utils";
 const badgeVariants = cva("inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-medium", {
   variants: {
     tone: {
-      success: "bg-success-soft text-success",
-      neutral: "bg-black/5 text-muted-foreground",
-      accent: "bg-accent-soft text-accent",
+      success: "bg-success-soft text-success ring-1 ring-inset ring-success/15",
+      neutral: "bg-[#eef0f7] text-muted-foreground ring-1 ring-inset ring-black/5",
+      accent: "bg-accent-soft text-accent ring-1 ring-inset ring-accent/15",
       danger: "bg-danger-soft text-danger",
     },
   },

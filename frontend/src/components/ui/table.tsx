@@ -10,7 +10,7 @@ export function Table({ className, ...props }: React.ComponentProps<"table">) {
 }
 
 export function TableHeader({ className, ...props }: React.ComponentProps<"thead">) {
-  return <thead className={cn("border-b border-border bg-surface-muted", className)} {...props} />;
+  return <thead className={cn("border-b border-border bg-gradient-to-b from-surface-muted to-[#f1f3fb]", className)} {...props} />;
 }
 
 export function TableBody({ className, ...props }: React.ComponentProps<"tbody">) {
@@ -18,14 +18,14 @@ export function TableBody({ className, ...props }: React.ComponentProps<"tbody">
 }
 
 export function TableRow({ className, ...props }: React.ComponentProps<"tr">) {
-  return <tr className={cn("border-b border-border transition-colors hover:bg-surface-muted/70", className)} {...props} />;
+  return <tr className={cn("border-b border-border/70 transition-colors hover:bg-accent-soft/50", className)} {...props} />;
 }
 
 export function TableHead({ className, ...props }: React.ComponentProps<"th">) {
   return (
     <th
       scope="col"
-      className={cn("h-10 whitespace-nowrap px-3 text-left sm:px-4 align-middle text-xs font-medium uppercase tracking-wide text-muted-foreground", className)}
+      className={cn("h-10 whitespace-nowrap px-3 text-left sm:px-4 align-middle text-[11px] font-semibold uppercase tracking-wider text-muted-foreground", className)}
       {...props}
     />
   );

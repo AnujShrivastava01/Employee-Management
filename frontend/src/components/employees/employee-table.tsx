@@ -76,7 +76,7 @@ export function EmployeeTable({ employees, sortBy, sortDir, onSort, onDelete, is
             <div className="flex items-center gap-3">
               <EmployeeAvatar name={e.fullName} />
               <div className="min-w-0 max-w-[10.5rem] sm:max-w-[16rem]">
-                <Link href={`/employees/${e.id}`} prefetch={false} className="block truncate font-medium hover:text-accent hover:underline">
+                <Link href={`/employees/${e.id}`} prefetch={false} className="block truncate font-semibold text-foreground hover:text-accent hover:underline">
                   {e.fullName}
                 </Link>
                 <span className="block truncate text-xs text-muted-foreground">{e.email}</span>
