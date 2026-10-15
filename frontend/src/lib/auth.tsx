@@ -1,6 +1,6 @@
 "use client";
 
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient, type QueryClient } from "@tanstack/react-query";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import * as React from "react";
 import { authApi } from "./api/auth";
@@ -8,6 +8,14 @@ import { setUnauthorizedHandler } from "./api/client";
 import type { CurrentUser } from "./api/types";
 
 const ME_KEY = ["me"] as const;
+
+/**
+ * Forgets everything cached for the previous session EXCEPT the `me` query. Calling `client.clear()` would
+ * also drop `me`, detaching the provider's observer from the cache so it would keep showing a stale user.
+ */
+function dropSessionData(client: QueryClient) {
+  client.removeQueries({ predicate: (query) => query.queryKey[0] !== ME_KEY[0] });
+}
 
 interface AuthContextValue {
   user: CurrentUser | null;
@@ -39,7 +47,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       isLoading,
       login: async (username, password) => {
         const user = await authApi.login(username, password);
-        client.clear();
+        dropSessionData(client);
         client.setQueryData(ME_KEY, user);
         return user;
       },
@@ -47,7 +55,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         try {
           await authApi.logout();
         } finally {
-          client.clear();
+          dropSessionData(client);
           client.setQueryData(ME_KEY, null);
         }
       },
