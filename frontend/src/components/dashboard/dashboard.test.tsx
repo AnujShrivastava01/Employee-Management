@@ -3,6 +3,7 @@ import { describe, expect, it, vi } from "vitest";
 import { createFakeApi, makeDepartment, makeEmployee, manyEmployees } from "@/test/fake-api";
 import { renderWithProviders } from "@/test/render";
 import { Dashboard } from "./dashboard";
+import { monthLabel } from "./hiring-trend-chart";
 
 vi.mock("next/navigation", async () => await import("@/test/navigation-mock"));
 // Recharts needs real layout (ResizeObserver sizes); the chart's data contract is verified through its props instead.
@@ -40,6 +41,24 @@ describe("<Dashboard>", () => {
     expect(within(recent).getByText("today")).toBeInTheDocument();
   });
 
+  it("greets the signed-in user and summarises the organisation in the hero", async () => {
+    createFakeApi({ employees: manyEmployees(6) }).install();
+    renderWithProviders(<Dashboard />);
+
+    expect(await screen.findByRole("heading", { level: 1, name: /Good (morning|afternoon|evening), admin/i })).toBeInTheDocument();
+    expect(await screen.findByText(/6 people across 2 departments · 4 active today/)).toBeInTheDocument();
+  });
+
+  it("renders the workforce status donut and the 12-month hiring trend from backend data", async () => {
+    createFakeApi({ employees: manyEmployees(6) }).install();
+    renderWithProviders(<Dashboard />);
+
+    expect(await screen.findByRole("img", { name: "4 active and 2 inactive employees" })).toBeInTheDocument();
+    const trend = screen.getByRole("img", { name: /Employees hired per month, last 12 months/ });
+    expect(trend).toHaveAccessibleName(/Oct ’26: 0/);
+    expect(trend).toHaveAccessibleName(/Dec ’26: 6/);
+  });
+
   it("offers quick actions", async () => {
     createFakeApi({ employees: manyEmployees(2) }).install();
     renderWithProviders(<Dashboard />);
@@ -74,5 +93,12 @@ describe("<Dashboard>", () => {
     expect(await screen.findByRole("alert")).toHaveTextContent("We couldn't load the dashboard");
     await user.click(screen.getByRole("button", { name: /Try again/ }));
     expect(await screen.findByTestId("stat-total-employees")).toHaveTextContent("2");
+  });
+});
+
+describe("monthLabel", () => {
+  it("formats yyyy-MM as a short month and two-digit year", () => {
+    expect(monthLabel("2026-01")).toBe("Jan ’26");
+    expect(monthLabel("2025-12")).toBe("Dec ’25");
   });
 });

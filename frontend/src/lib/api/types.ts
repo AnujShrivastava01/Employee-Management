@@ -76,12 +76,19 @@ export interface DepartmentHeadcount {
   count: number;
 }
 
+export interface HiringTrendPoint {
+  /** yyyy-MM */
+  month: string;
+  count: number;
+}
+
 export interface EmployeeStats {
   totalEmployees: number;
   activeEmployees: number;
   inactiveEmployees: number;
   totalDepartments: number;
   departmentDistribution: DepartmentHeadcount[];
+  hiringTrend: HiringTrendPoint[];
   recentlyJoined: Employee[];
 }
 

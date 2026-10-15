@@ -116,6 +116,7 @@ export function createFakeApi(initial: { employees?: Employee[]; departments?: D
       inactiveEmployees: state.employees.length - active,
       totalDepartments: state.departments.length,
       departmentDistribution: dist,
+      hiringTrend: Array.from({ length: 12 }, (_, i) => ({ month: `2026-${String(i + 1).padStart(2, "0")}`, count: i === 11 ? state.employees.length : 0 })),
       recentlyJoined: [...state.employees].sort((a, b) => b.dateOfJoining.localeCompare(a.dateOfJoining)).slice(0, 5),
     });
   }
