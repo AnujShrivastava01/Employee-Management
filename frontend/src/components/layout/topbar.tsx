@@ -61,8 +61,8 @@ export function Topbar() {
         <Search aria-hidden className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
         <Input
           type="search"
-          aria-label="Search employees"
-          placeholder="Search employees…"
+          aria-label="Quick search"
+          placeholder="Quick search employees…"
           value={query}
           onChange={(event) => setQuery(event.target.value)}
           className="bg-surface-muted pl-9 shadow-none"

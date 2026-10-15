@@ -54,6 +54,7 @@ export function EmployeeForm({ mode, defaultValues, departments, departmentsLoad
   const [formError, setFormError] = React.useState<string | null>(null);
   const [confirmLeave, setConfirmLeave] = React.useState(false);
   const submitted = React.useRef(false);
+  const inFlight = React.useRef(false);
 
   const form = useForm<EmployeeFormValues>({
     resolver: zodResolver(employeeFormSchema),
@@ -78,11 +79,15 @@ export function EmployeeForm({ mode, defaultValues, departments, departmentsLoad
   };
 
   const submit = handleSubmit(async (values) => {
+    // The button disables itself after a re-render, but a fast double-click can slip in before that.
+    if (inFlight.current) return;
+    inFlight.current = true;
     setFormError(null);
     try {
       await onSubmit(values);
       submitted.current = true;
     } catch (error) {
+      inFlight.current = false; // only a failed save may be retried; a successful one navigates away
       if (error instanceof ApiError && error.fieldErrors.length > 0) {
         let mapped = 0;
         for (const detail of error.fieldErrors) {

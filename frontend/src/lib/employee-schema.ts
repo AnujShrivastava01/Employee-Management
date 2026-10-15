@@ -38,7 +38,7 @@ export const employeeFormSchema = z.object({
     .trim()
     .min(1, "Phone number is required")
     .regex(/^\+?[0-9][0-9 ()-]{5,18}[0-9]$/, "Enter a valid phone number, e.g. +91 98765 43210"),
-  departmentId: z.string().min(1, "Select a department"),
+  departmentId: z.string().min(1, "Department is required"),
   designation: z
     .string()
     .trim()

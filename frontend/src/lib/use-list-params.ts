@@ -13,15 +13,24 @@ export function useListParams() {
   const serialized = searchParams.toString();
   const params = React.useMemo(() => parseListParams(new URLSearchParams(serialized)), [serialized]);
 
+  // router.replace() settles asynchronously, so two quick changes (e.g. picking a department and then a
+  // status, or a debounced search firing right after a filter change) would each start from the same stale
+  // URL and the second would silently drop the first. `latest` always holds the most recently requested state.
+  const latest = React.useRef(params);
+  React.useEffect(() => {
+    latest.current = params;
+  }, [params]);
+
   const update = React.useCallback(
     (patch: Partial<EmployeeListParams>) => {
       // Changing anything except the page itself sends the user back to the first page.
       const resetPage = !("page" in patch);
-      const next = { ...params, ...(resetPage ? { page: 0 } : {}), ...patch };
+      const next = { ...latest.current, ...(resetPage ? { page: 0 } : {}), ...patch };
+      latest.current = next;
       const qs = serializeListParams(next);
       router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
     },
-    [params, pathname, router],
+    [pathname, router],
   );
 
   const reset = React.useCallback(() => update({ search: undefined, department: undefined, status: undefined }), [update]);
