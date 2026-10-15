@@ -381,6 +381,7 @@ is always meaningful. It never touches a database that already has data. Turn it
 | 403 on writes from curl | Browser-style session calls need the `X-XSRF-TOKEN` header; use `-u user:pass` (Basic) instead. |
 | Port already in use | Change `FRONTEND_PORT`, `BACKEND_PORT` or `POSTGRES_PORT` in `.env` (and `CORS_ALLOWED_ORIGINS` if the frontend port changes). |
 | Compose: backend unhealthy | `docker compose logs backend` — usually the database credentials. After changing `POSTGRES_*` for an existing volume run `docker compose down -v`. |
+| Windows: container fails with `bad interpreter: /bin/sh^M` | A shell script was checked out with CRLF line endings. `.gitattributes` now forces LF; pull the latest, then run `docker compose down -v` and `docker compose up --build`. |
 | Playwright cannot find a browser | `cd frontend && npx playwright install chromium`. |
 
 ## 18. Security notes and limitations
