@@ -68,8 +68,17 @@ export function EditEmployee({ id }: { id: string }) {
   const employee = useEmployee(id);
   const update = useUpdateEmployee(id);
 
-  if (employee.isPending) {
+  // The form is uncontrolled: a <select> cannot show a value whose <option> does not exist yet, so the
+  // form is mounted only once both the employee and the department options are available.
+  if (employee.isPending || (departments.isPending && !employee.isError)) {
     return <Skeleton role="status" aria-label="Loading employee" className="h-96 w-full" />;
+  }
+  if (departments.isError && !employee.isError) {
+    return (
+      <Card>
+        <ErrorState error={departments.error} title="We couldn't load departments" onRetry={() => departments.refetch()} />
+      </Card>
+    );
   }
   if (employee.isError) {
     const notFound = employee.error instanceof ApiError && employee.error.status === 404;
@@ -105,7 +114,6 @@ export function EditEmployee({ id }: { id: string }) {
         mode="edit"
         defaultValues={toFormValues(employee.data)}
         departments={departments.data ?? []}
-        departmentsLoading={departments.isPending}
         returnHref={`/employees/${id}`}
         onSubmit={async (values) => {
           const saved = await update.mutateAsync(toEmployeeInput(values));

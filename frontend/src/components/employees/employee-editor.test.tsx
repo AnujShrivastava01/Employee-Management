@@ -220,6 +220,27 @@ describe("<EditEmployee>", () => {
     expect(screen.getByLabelText(/^Employment status/)).toHaveValue("ACTIVE");
   });
 
+  it("shows the current department even when the department list arrives after the employee", async () => {
+    const api = createFakeApi({ employees: [existing] });
+    api.install();
+    const releaseDepartments = api.holdNext("GET", /^\/api\/departments$/); // slow departments request
+    const { user } = renderWithProviders(<EditEmployee id="7" />);
+
+    // The employee has loaded; the department list is still in flight. Only now does it arrive.
+    await waitFor(() => expect(api.calls("GET", /^\/api\/employees\/7$/)).toHaveLength(1));
+    await new Promise((resolve) => setTimeout(resolve, 50));
+    releaseDepartments();
+
+    expect(await screen.findByLabelText(/^Full name/)).toHaveValue("Ananya Iyer");
+    await waitFor(() => expect(screen.getByLabelText(/^Department/)).toHaveValue("2"));
+
+    // ...and the unchanged department survives validation when saving another change.
+    await user.type(screen.getByLabelText(/^Designation/), " II");
+    await user.click(screen.getByRole("button", { name: "Save changes" }));
+    await waitFor(() => expect(api.calls("PUT", /employees\/7/)).toHaveLength(1));
+    expect(api.calls("PUT", /employees\/7/)[0]!.body).toMatchObject({ departmentId: 2, designation: "Design Lead II" });
+  });
+
   it("saves only after a change and PUTs the full record", async () => {
     const api = createFakeApi({ employees: [existing] });
     api.install();

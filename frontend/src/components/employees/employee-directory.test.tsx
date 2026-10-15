@@ -1,7 +1,7 @@
 import { act, screen, waitFor, within } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { createFakeApi, makeEmployee, manyEmployees } from "@/test/fake-api";
-import { currentSearchParams, setUrl } from "@/test/navigation-mock";
+import { currentSearchParams, setNavigationDelay, setUrl } from "@/test/navigation-mock";
 import { renderWithProviders } from "@/test/render";
 import { EmployeeDirectory } from "./employee-directory";
 
@@ -100,6 +100,25 @@ describe("<EmployeeDirectory>", () => {
     expect(currentSearchParams().get("search")).toBe("anuj");
     // typing four characters must not fire four requests
     expect(api.calls("GET", /^\/api\/employees$/).filter((c) => c.query.get("search")).length).toBe(1);
+  });
+
+  it("does not lose characters typed while the URL update for earlier characters is still in flight", async () => {
+    const api = createFakeApi({ employees: manyEmployees(3) });
+    api.install();
+    const { user } = renderWithProviders(<EmployeeDirectory />);
+    await rows();
+    setNavigationDelay(400); // a slow router round-trip
+
+    const box = screen.getByLabelText("Search employees");
+    await user.type(box, "per");
+    await waitFor(() => expect(api.calls("GET", /^\/api\/employees$/).some((c) => c.query.get("search") === "per")).toBe(false)); // still debouncing
+    await new Promise((resolve) => setTimeout(resolve, 350)); // debounce fires -> router.replace is now pending
+    await user.type(box, "son"); // user keeps typing before the URL has settled
+
+    await waitFor(() => expect(currentSearchParams().get("search")).toBe("per"), { timeout: 2000 }); // the stale echo lands...
+    expect(box).toHaveValue("person"); // ...and must not overwrite what was typed since
+    await waitFor(() => expect(currentSearchParams().get("search")).toBe("person"), { timeout: 3000 });
+    expect(box).toHaveValue("person");
   });
 
   it("combines department, status and search filters", async () => {

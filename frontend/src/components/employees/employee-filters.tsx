@@ -18,15 +18,31 @@ interface EmployeeFiltersProps {
 
 export function EmployeeFilters({ params, departments, onChange, onClear, debounceMs = 300 }: EmployeeFiltersProps) {
   const [text, setText] = React.useState(params.search ?? "");
+  // Search values we pushed to the URL whose router round-trip has not come back yet (oldest first). The router
+  // echoes each of them back asynchronously; those echoes must not overwrite characters typed in the meantime.
+  const inFlight = React.useRef<(string | undefined)[]>([]);
+  const latestIntent = () => (inFlight.current.length ? inFlight.current[inFlight.current.length - 1] : params.search);
 
-  // Keep the box in sync when the URL changes from elsewhere (clear filters, topbar search, back button).
-  React.useEffect(() => setText(params.search ?? ""), [params.search]);
+  // Adopt changes that did NOT originate from typing (clear filters, topbar search, back button).
+  React.useEffect(() => {
+    const echoed = inFlight.current.indexOf(params.search);
+    if (echoed >= 0) {
+      inFlight.current = inFlight.current.slice(echoed + 1);
+      return;
+    }
+    inFlight.current = [];
+    setText(params.search ?? "");
+  }, [params.search]);
 
   // Push typing to the URL after a short pause so each keystroke does not hit the API.
   React.useEffect(() => {
     const trimmed = text.trim();
-    if (trimmed === (params.search ?? "")) return;
-    const timer = setTimeout(() => onChange({ search: trimmed || undefined }), debounceMs);
+    if (trimmed === (latestIntent() ?? "")) return;
+    const timer = setTimeout(() => {
+      const value = trimmed || undefined;
+      inFlight.current.push(value);
+      onChange({ search: value });
+    }, debounceMs);
     return () => clearTimeout(timer);
     // eslint-disable-next-line react-hooks/exhaustive-deps -- only react to typing, not to every params change
   }, [text]);
