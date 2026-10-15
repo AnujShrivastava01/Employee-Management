@@ -1,7 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ArrowLeft, Loader2, Save } from "lucide-react";
+import { ArrowLeft, Briefcase, Loader2, Save, UserRound, Wallet, type LucideIcon } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import * as React from "react";
@@ -37,11 +37,14 @@ interface EmployeeFormProps {
 
 const FORM_FIELDS = Object.keys(employeeFormSchema.shape) as (keyof EmployeeFormValues)[];
 
-function Section({ title, description, children }: { title: string; description: string; children: React.ReactNode }) {
+function Section({ title, description, icon: Icon, children }: { title: string; description: string; icon: LucideIcon; children: React.ReactNode }) {
   return (
-    <section className="grid gap-5 border-b border-border py-6 first:pt-0 last:border-0 last:pb-0 lg:grid-cols-[14rem_1fr] lg:gap-10">
+    <section className="grid gap-5 border-b border-border py-7 first:pt-0 last:border-0 last:pb-0 lg:grid-cols-[15rem_1fr] lg:gap-10">
       <div>
-        <h2 className="text-sm font-semibold">{title}</h2>
+        <span className="mb-3 grid size-10 place-items-center rounded-xl bg-gradient-to-br from-[#7b8af0] to-[#3b4bd0] text-white shadow-md">
+          <Icon aria-hidden className="size-5" />
+        </span>
+        <h2 className="font-display text-base font-semibold text-navy">{title}</h2>
         <p className="mt-1 text-sm text-muted-foreground">{description}</p>
       </div>
       <div className="grid gap-5 sm:grid-cols-2">{children}</div>
@@ -120,7 +123,7 @@ export function EmployeeForm({ mode, defaultValues, departments, departmentsLoad
             </p>
           )}
 
-          <Section title="Identity" description="How this person is identified and contacted.">
+          <Section icon={UserRound} title="Identity" description="How this person is identified and contacted.">
             <Field id="employeeId" label="Employee ID" required error={errors.employeeId?.message} hint="Unique, e.g. EMP-1037">
               {(aria) => <Input {...aria} {...control("employeeId")} placeholder="EMP-1037" autoComplete="off" maxLength={30} />}
             </Field>
@@ -135,7 +138,7 @@ export function EmployeeForm({ mode, defaultValues, departments, departmentsLoad
             </Field>
           </Section>
 
-          <Section title="Employment" description="Where this person works and their current standing.">
+          <Section icon={Briefcase} title="Employment" description="Where this person works and their current standing.">
             <Field id="departmentId" label="Department" required error={errors.departmentId?.message}>
               {(aria) => (
                 <Select {...aria} {...control("departmentId")} disabled={departmentsLoading}>
@@ -173,14 +176,14 @@ export function EmployeeForm({ mode, defaultValues, departments, departmentsLoad
             </Field>
           </Section>
 
-          <Section title="Compensation" description="Annual gross salary in Indian rupees.">
+          <Section icon={Wallet} title="Compensation" description="Annual gross salary in Indian rupees.">
             <Field id="salary" label="Annual salary (₹)" required error={errors.salary?.message} hint="Up to 2 decimal places">
               {(aria) => <Input {...aria} {...control("salary")} inputMode="decimal" placeholder="1850000" autoComplete="off" />}
             </Field>
           </Section>
         </CardContent>
 
-        <div className="flex flex-col-reverse gap-2 border-t border-border bg-surface-muted px-6 py-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-col-reverse gap-2 rounded-b-xl border-t border-border bg-gradient-to-b from-surface-muted to-[#eff1fb] px-6 py-4 sm:flex-row sm:items-center sm:justify-between">
           <Button variant="ghost" onClick={leave} className="justify-start">
             <ArrowLeft /> Back
           </Button>

@@ -198,7 +198,14 @@ export function DepartmentManager() {
             <TableBody>
               {data.map((department) => (
                 <TableRow key={department.id}>
-                  <TableCell className="font-medium">{department.name}</TableCell>
+                  <TableCell>
+                    <div className="flex items-center gap-3">
+                      <span aria-hidden className="grid size-9 shrink-0 place-items-center rounded-xl bg-gradient-to-br from-[#7b8af0] to-[#3b4bd0] text-xs font-bold text-white shadow-sm">
+                        {department.name.slice(0, 2).toUpperCase()}
+                      </span>
+                      <span className="font-semibold">{department.name}</span>
+                    </div>
+                  </TableCell>
                   <TableCell className="hidden max-w-md truncate text-muted-foreground sm:table-cell">{department.description ?? "—"}</TableCell>
                   <TableCell className="text-right tabular-nums">
                     {department.employeeCount > 0 ? (

@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowLeft, Mail, Pencil, Phone, Trash2 } from "lucide-react";
+import { ArrowLeft, Briefcase, Building2, Mail, Pencil, Phone, Trash2, Wallet } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import * as React from "react";
@@ -98,6 +98,29 @@ export function EmployeeDetails({ id }: { id: string }) {
         }
       />
 
+      <section aria-label="Role summary" className="relative mb-6 overflow-hidden rounded-2xl bg-brand p-5 text-white shadow-lift sm:p-6">
+        <div aria-hidden className="bg-dots absolute inset-0 [mask-image:linear-gradient(100deg,transparent_20%,black)]" />
+        <div aria-hidden className="animate-float absolute -right-6 -top-8 size-28 rounded-full bg-coral/90" />
+        <div aria-hidden className="animate-float-slow absolute bottom-[-2.5rem] right-24 hidden size-24 rounded-full bg-periwinkle/90 sm:block" />
+        <dl className="relative grid gap-3 sm:grid-cols-3">
+          {[
+            [Building2, "Department", employee.department.name],
+            [Briefcase, "Designation", employee.designation],
+            [Wallet, "Annual salary", formatSalary(employee.salary)],
+          ].map(([Icon, label, value]) => {
+            const I = Icon as typeof Building2;
+            return (
+              <div key={label as string} className="rounded-xl bg-white/10 p-4 ring-1 ring-inset ring-white/20 backdrop-blur">
+                <dt className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-wider text-white/65">
+                  <I aria-hidden className="size-3.5" /> {label as string}
+                </dt>
+                <dd className="mt-1.5 break-words font-display text-lg font-bold leading-snug">{value as string}</dd>
+              </div>
+            );
+          })}
+        </dl>
+      </section>
+
       <div className="grid gap-6 lg:grid-cols-3">
         <Card className="lg:col-span-2">
           <CardHeader>
@@ -106,8 +129,6 @@ export function EmployeeDetails({ id }: { id: string }) {
           <CardContent className="pt-2">
             <dl className="divide-y divide-border">
               <Detail label="Employee ID">{employee.employeeId}</Detail>
-              <Detail label="Department">{employee.department.name}</Detail>
-              <Detail label="Designation">{employee.designation}</Detail>
               <Detail label="Date of joining">
                 {formatDate(employee.dateOfJoining)}
                 <span className="ml-2 font-normal text-muted-foreground">({formatRelativeDate(employee.dateOfJoining)})</span>
@@ -115,7 +136,6 @@ export function EmployeeDetails({ id }: { id: string }) {
               <Detail label="Employment status">
                 <StatusBadge status={employee.status} />
               </Detail>
-              <Detail label="Annual salary">{formatSalary(employee.salary)}</Detail>
             </dl>
           </CardContent>
         </Card>
