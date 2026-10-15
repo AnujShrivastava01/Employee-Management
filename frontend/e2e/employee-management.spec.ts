@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 import fs from "node:fs";
-import { ADMIN_USER, login } from "./helpers";
+import { ADMIN_PASSWORD, ADMIN_USER, login } from "./helpers";
 
 // Smoke tests against the REAL stack (Next.js -> Spring Boot -> PostgreSQL) with demo data loaded.
 
@@ -110,6 +110,16 @@ test.describe("employee directory", () => {
 });
 
 test.describe("employee lifecycle", () => {
+  // Remove anything this test created even if it fails half-way, so reruns and screenshots see clean data.
+  test.afterEach(async ({ page }) => {
+    const basic = `Basic ${Buffer.from(`${ADMIN_USER}:${ADMIN_PASSWORD}`).toString("base64")}`;
+    const list = await page.request.get("/api/employees?search=E2E-&size=100", { headers: { Authorization: basic } });
+    if (!list.ok()) return;
+    for (const employee of (await list.json()).content as { id: number }[]) {
+      await page.request.delete(`/api/employees/${employee.id}`, { headers: { Authorization: basic } });
+    }
+  });
+
   test("create → view → edit → delete (with confirmation) against the real API", async ({ page }) => {
     const suffix = Date.now().toString().slice(-7);
     const employeeId = `E2E-${suffix}`;
