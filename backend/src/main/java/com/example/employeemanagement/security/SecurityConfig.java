@@ -1,5 +1,6 @@
 package com.example.employeemanagement.security;
 
+import jakarta.servlet.http.HttpServletResponse;
 import java.util.Arrays;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Value;
@@ -58,6 +59,11 @@ public class SecurityConfig {
                 .addFilterAfter(new CsrfCookieFilter(), BasicAuthenticationFilter.class)
                 .securityContext(context -> context.securityContextRepository(securityContextRepository))
                 .httpBasic(basic -> basic.authenticationEntryPoint(entryPoint))
+                .logout(logout -> logout
+                        .logoutUrl("/api/auth/logout") // POST only, CSRF protected
+                        .logoutSuccessHandler((request, response, authentication) ->
+                                response.setStatus(HttpServletResponse.SC_NO_CONTENT))
+                        .deleteCookies("JSESSIONID"))
                 .exceptionHandling(handling -> handling
                         .authenticationEntryPoint(entryPoint)
                         .accessDeniedHandler(accessDeniedHandler))

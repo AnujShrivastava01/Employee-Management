@@ -1,0 +1,17 @@
+# Integration tests run against a real PostgreSQL database (default: the `ems_test` database
+# created by database/init/01-create-test-db.sql). Override with TEST_DB_* variables.
+spring:
+  datasource:
+    url: ${TEST_DB_URL:jdbc:postgresql://localhost:5432/ems_test}
+    username: ${TEST_DB_USERNAME:ems}
+    password: ${TEST_DB_PASSWORD:ems_password}
+app:
+  security:
+    admin-username: it-admin
+    admin-password: it-password-123
+  seed:
+    enabled: false
+logging:
+  level:
+    http.access: WARN
+    com.example.employeemanagement: WARN
