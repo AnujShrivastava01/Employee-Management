@@ -1,21 +1,45 @@
+import Image from "next/image";
 import { cn } from "@/lib/utils";
+import mark from "./logo-mark.png";
 
 export const APP_NAME = "Rosterly";
 
-/** Simple monogram + wordmark; pure SVG/CSS so there are no image requests. */
-export function Logo({ className, showName = true }: { className?: string; showName?: boolean }) {
+interface LogoProps {
+  className?: string;
+  showName?: boolean;
+  /** `light` is for dark backgrounds (white wordmark). */
+  tone?: "dark" | "light";
+  size?: "sm" | "md" | "lg";
+}
+
+const SIZES = { sm: 28, md: 36, lg: 56 } as const;
+
+/** The Rosterly mark (src/app/logo.png, downsized) plus wordmark. Unoptimised: it is a tiny static asset. */
+export function Logo({ className, showName = true, tone = "dark", size = "md" }: LogoProps) {
+  const px = SIZES[size];
   return (
     <span className={cn("inline-flex items-center gap-2.5", className)}>
-      <span
+      <Image
+        src={mark}
+        alt=""
         aria-hidden
-        className="grid size-8 place-items-center rounded-lg bg-accent text-accent-foreground shadow-sm"
-      >
-        <svg viewBox="0 0 24 24" className="size-[18px]" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
-          <path d="M7 20V4h6a4.5 4.5 0 0 1 0 9H7" />
-          <path d="m13 13 4.5 7" />
-        </svg>
-      </span>
-      {showName && <span className="text-[17px] font-semibold tracking-tight text-foreground">{APP_NAME}</span>}
+        width={px}
+        height={px}
+        unoptimized
+        priority
+        className={cn("rounded-[28%]", tone === "light" ? "shadow-[0_0_0_1.5px_rgb(255_255_255/0.35),0_6px_16px_-4px_rgb(0_0_0/0.5)]" : "shadow-[0_6px_16px_-6px_rgb(20_27_88/0.55)]")}
+      />
+      {showName && (
+        <span
+          className={cn(
+            "font-display font-bold tracking-tight",
+            size === "lg" ? "text-3xl" : "text-[19px]",
+            tone === "light" ? "text-white" : "text-navy",
+          )}
+        >
+          {APP_NAME}
+        </span>
+      )}
     </span>
   );
 }
