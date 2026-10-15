@@ -4,7 +4,7 @@ A full-stack employee management application: a **Next.js** web UI, a **Spring B
 **PostgreSQL** database, with sessions-based administrator login, server-side search/filter/pagination,
 a statistics dashboard, department management and CSV export.
 
-Built for the Kloudspot India Private Limited candidate technical assessment.
+Built for the Kloudspot candidate technical assessment.
 
 | | |
 |---|---|
