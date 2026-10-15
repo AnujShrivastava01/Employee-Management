@@ -741,7 +741,8 @@
                   "pm.test(\"Status is 200\", function () { pm.response.to.have.status(200); });",
                   "const s = pm.response.json();",
                   "pm.test(\"Totals add up\", function () { pm.expect(s.activeEmployees + s.inactiveEmployees).to.eql(s.totalEmployees); });",
-                  "pm.test(\"Has distribution and recent joiners\", function () { pm.expect(s.departmentDistribution).to.be.an(\"array\"); pm.expect(s.recentlyJoined).to.be.an(\"array\"); });"
+                  "pm.test(\"Has distribution and recent joiners\", function () { pm.expect(s.departmentDistribution).to.be.an(\"array\"); pm.expect(s.recentlyJoined).to.be.an(\"array\"); });",
+                  "pm.test(\"Hiring trend covers 12 months\", function () { pm.expect(s.hiringTrend).to.have.length(12); pm.expect(s.hiringTrend[11]).to.have.property(\"month\"); });"
                 ]
               }
             }

@@ -49,8 +49,8 @@ application by `frontend/e2e/screenshots.spec.ts`.
 * **Directory** with server-side search (name, email, employee ID), department filter, status filter,
   sortable columns, pagination (10 / 20 / 50 per page), total counts, "clear filters", loading / empty /
   no-results / error states. All of them work together, and the state is kept in the URL.
-* **Dashboard** with total / active / inactive employees, department distribution chart and recently joined
-  employees. All numbers come from the backend.
+* **Dashboard** with a branded welcome hero, total / active / inactive employees, a 12-month hiring trend, a
+  workforce-status donut, a department distribution chart and recently joined employees. All numbers come from the backend.
 * Forms with field-level validation on the client (Zod) **and** the server (Bean Validation); server errors
   such as duplicate IDs or emails are shown next to the right field and the entered values are kept.
   Duplicate submissions are blocked and unsaved changes are protected.
@@ -327,8 +327,8 @@ header `X-XSRF-TOKEN: <cookie value>`, then every write repeats that header.
 
 | Command | What it runs |
 |---|---|
-| `cd backend && mvn verify` | 113 backend tests: Mockito unit tests + MockMvc integration tests on PostgreSQL, JaCoCo report in `backend/target/site/jacoco` |
-| `cd frontend && npm test` | 97 Vitest / React Testing Library tests |
+| `cd backend && mvn verify` | 115 backend tests: Mockito unit tests + MockMvc integration tests on PostgreSQL, JaCoCo report in `backend/target/site/jacoco` |
+| `cd frontend && npm test` | 100 Vitest / React Testing Library tests |
 | `cd frontend && npm run lint && npm run typecheck && npm run build` | ESLint, strict TypeScript, production build |
 | `cd frontend && npx playwright test e2e/employee-management.spec.ts` | 10 end-to-end tests against the **running** stack |
 | `make test` | backend + frontend (everything except Playwright) |
@@ -359,7 +359,7 @@ the dashboard, departments and login.
 3. Run folders top to bottom (or use the Collection Runner). Authentication is HTTP Basic at collection level.
 
 Command-line: `npx newman run postman/employee-management.postman_collection.json`
-(20 requests, 40 assertions; all passing against the running API when this was written).
+(20 requests, 41 assertions; all passing against the running API when this was written).
 
 ## 16. Demo data
 
@@ -415,11 +415,11 @@ Run on the machine where this project was built (Linux, JDK 21, Node 22, Postgre
 
 | Check | Result |
 |---|---|
-| `mvn verify` (backend) | **113 tests, 0 failures**; ~76 % instruction coverage, service layer 93–100 % |
-| `npm test` (frontend) | **97 tests, 0 failures** |
+| `mvn verify` (backend) | **115 tests, 0 failures**; ~76 % instruction coverage, service layer 93–100 % |
+| `npm test` (frontend) | **100 tests, 0 failures** |
 | `npm run lint`, `npm run typecheck`, `npm run build` | pass |
 | Playwright e2e (real stack) | **10 / 10** passing; repeated cold-start runs 16 / 16 passing |
-| Newman (Postman collection) | 20 requests, **40 / 40** assertions passing |
+| Newman (Postman collection) | 20 requests, **41 / 41** assertions passing |
 | `docker compose config` | valid |
-| `docker compose up --build` | **not run** — no Docker daemon in the build environment (see section 7) |
+| `docker compose up --build` | images build on Windows (confirmed by the project owner); the first start hit a CRLF line-ending bug in the DB init script, fixed in a later commit. Not run in the sandbox (no Docker daemon) |
 | Screenshots | real captures of the running app, in `screenshots/` |
