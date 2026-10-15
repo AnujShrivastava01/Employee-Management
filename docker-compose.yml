@@ -1,0 +1,66 @@
+# Employee Management System — PostgreSQL + Spring Boot API + Next.js UI.
+#   cp .env.example .env     (optional: every value has a local-development default)
+#   docker compose up --build
+name: employee-management
+
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-ems}
+      POSTGRES_USER: ${POSTGRES_USER:-ems}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-ems_password}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./database/init:/docker-entrypoint-initdb.d:ro
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  backend:
+    build:
+      context: ./backend
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      # Service-to-service traffic uses the compose network name `db`, not localhost.
+      DB_URL: jdbc:postgresql://db:5432/${POSTGRES_DB:-ems}
+      DB_USERNAME: ${POSTGRES_USER:-ems}
+      DB_PASSWORD: ${POSTGRES_PASSWORD:-ems_password}
+      CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS:-http://localhost:3000}
+      ADMIN_USERNAME: ${ADMIN_USERNAME:-admin}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-Admin@12345}
+      SEED_DEMO_DATA: ${SEED_DEMO_DATA:-true}
+      SESSION_COOKIE_SECURE: ${SESSION_COOKIE_SECURE:-false}
+    ports:
+      - "${BACKEND_PORT:-8080}:8080"
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:8080/actuator/health/liveness | grep -q UP"]
+      interval: 10s
+      timeout: 5s
+      start_period: 40s
+      retries: 6
+
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        # The Next.js server proxies /api/* here (container-to-container). The browser only ever
+        # talks to the frontend origin, so it never needs the backend's address.
+        BACKEND_INTERNAL_URL: http://backend:8080
+    restart: unless-stopped
+    depends_on:
+      backend:
+        condition: service_healthy
+    ports:
+      - "${FRONTEND_PORT:-3000}:3000"
+
+volumes:
+  pgdata:
